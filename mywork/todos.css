@@ -1,0 +1,18 @@
+#todo-app {
+	border: 1px solid;
+	width: 600px;
+	text-align: center;
+	margin: 0 auto;
+	border-radius: 5px;
+}
+
+#todo-app #new-todo {
+	width: 540px;
+	height: 50px;
+	font-size: 40px;
+	outline: none;
+}
+
+#credit {
+	width:600px;
+}

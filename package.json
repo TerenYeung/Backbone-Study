@@ -1,0 +1,15 @@
+{
+  "name": "backbone-study",
+  "version": "1.0.0",
+  "description": "this is a study of backbone",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "backbone",
+    "frameworks"
+  ],
+  "author": "teren",
+  "license": "MIT"
+}

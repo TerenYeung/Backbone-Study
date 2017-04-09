@@ -1,0 +1,14 @@
+{
+  "name": "mywork-backbone",
+  "version": "1.0.0",
+  "description": "mywork about backbone",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon --inspect todos.js"
+  },
+  "author": "teren",
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "1.11.0"
+  }
+}
