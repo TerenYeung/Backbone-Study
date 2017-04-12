@@ -70,6 +70,16 @@
     // Implement fancy features of the Events API such as multiple event
     // names `"change blur"` and jQuery-style event maps `{change: action}`
     // in terms of the existing API.
+
+    /*
+        var event = new Backbone.Model();
+        event.on("show",cb)
+        event.on("show:title",cb)
+        event.on({
+            "show:title",cb1,
+            "show:foot",cb2
+        })
+    */
     var eventsApi = function(obj, action, name, rest) {
         if (!name) return true;
         if (typeof name === 'object') {
