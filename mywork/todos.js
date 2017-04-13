@@ -33,7 +33,10 @@ $(function(){
 
         template: _.template($('#item-template').html()),
 
+        render: function(todoModel){
 
+            return this.$el.append(this.template(todoModel))
+        }
 
 
 
@@ -69,14 +72,14 @@ $(function(){
 
             this.todos.add(todo)
                       .trigger('addTodo',todo.attributes)
-
+            this.$input.val('');
         },
 
 
         render: function(todoModel){
             let todoView = new TodoView;
-            let todoHTML = todoView.template(todoModel)
-            this.$todoList.append(todoHTML);
+            let $todoHTML = todoView.render(todoModel)
+            this.$todoList.append($todoHTML);
         },
 
     });
@@ -84,6 +87,5 @@ $(function(){
 
     let app = new AppView;
 
-    // console.log(_.template('<h1>hello<h1>')())
 
 })
