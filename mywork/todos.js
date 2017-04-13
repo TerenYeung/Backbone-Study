@@ -63,9 +63,9 @@ $(function(){
         }
 
 
-        // render: function(){
-        //     console.log("I'm rendering...");
-        // },
+        render: function(){
+            console.log("I'm rendering...");
+        },
 
     })
 
