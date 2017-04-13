@@ -27,9 +27,17 @@ $(function(){
 
         className: 'todo-item',
 
+        initialize: function(){
+
+        },
+
+        template: _.template($('#item-template').html()),
 
 
-    })
+
+
+
+    });
 
     let AppView = Backbone.View.extend({
 
@@ -38,8 +46,11 @@ $(function(){
 
         initialize: function(){
 
-            this.todos = new Todos,
+            this.todos = new Todos;
             this.$input = this.$el.find('#new-todo');
+            this.$todoList = this.$el.find('#todo-list');
+
+            this.listenTo(this.todos,'addTodo',this.render);
 
         },
 
@@ -57,19 +68,22 @@ $(function(){
             let todo = new Todo({title: title});
 
             this.todos.add(todo)
+                      .trigger('addTodo',todo.attributes)
 
-            console.log(this.todos.models)
-
-        }
-
-
-        render: function(){
-            console.log("I'm rendering...");
         },
 
-    })
+
+        render: function(todoModel){
+            let todoView = new TodoView;
+            let todoHTML = todoView.template(todoModel)
+            this.$todoList.append(todoHTML);
+        },
+
+    });
 
 
     let app = new AppView;
+
+    // console.log(_.template('<h1>hello<h1>')())
 
 })
