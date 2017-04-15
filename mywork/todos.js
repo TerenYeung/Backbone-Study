@@ -31,12 +31,24 @@ $(function(){
 
         },
 
+        events: {
+            'click .destroy': 'deleteTodo'
+        },
+
+
         template: _.template($('#item-template').html()),
 
-        render: function(todoModel){
+        render: function(data){
 
-            return this.$el.append(this.template(todoModel))
+            return this.$el.append(this.template(data))
+        },
+
+        deleteTodo: function(){
+             this.model.destroy();
+             this.$el.html('')
         }
+
+
 
 
 
@@ -70,15 +82,17 @@ $(function(){
 
             let todo = new Todo({title: title});
 
+            //由todos集合出发addTodo事件
+            //然后由整个appView进行捕获
             this.todos.add(todo)
-                      .trigger('addTodo',todo.attributes)
+                      .trigger('addTodo',todo)
             this.$input.val('');
         },
 
 
-        render: function(todoModel){
-            let todoView = new TodoView;
-            let $todoHTML = todoView.render(todoModel)
+        render: function(todo){
+            let todoView = new TodoView({model: todo});
+            let $todoHTML = todoView.render(todo.attributes)
             this.$todoList.append($todoHTML);
         },
 
