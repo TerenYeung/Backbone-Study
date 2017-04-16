@@ -9,6 +9,10 @@ $(function(){
                 order: 0,
             }
         },
+
+        toggle: function(){
+            this.save({'done': !this.get('done')});
+        },
     });
 
     var Todos = Backbone.Collection.extend({
@@ -29,6 +33,12 @@ $(function(){
 
         template: _.template($('#item-template').html()),
 
+        events: {
+
+            'click .toggle'     : 'toggleDone',
+            'click a.destroy'   : 'clear',
+        },
+
         initialize: function(){
 
             this.listenTo(this.model, 'change', this.render);
@@ -41,6 +51,13 @@ $(function(){
             return this;
 
         },
+
+        toggleDone: function(){
+
+            this.model.toggle();
+        },
+
+        clear: function()
 
     })
 
