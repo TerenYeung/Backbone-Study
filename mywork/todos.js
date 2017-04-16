@@ -42,6 +42,7 @@ $(function(){
         initialize: function(){
 
             this.listenTo(this.model, 'change', this.render);
+            this.listenTo(this.model, 'destroy', this.remove);
         },
 
         render: function(){
@@ -57,7 +58,10 @@ $(function(){
             this.model.toggle();
         },
 
-        clear: function()
+        clear: function(){
+
+            this.model.destroy();
+        },
 
     })
 
