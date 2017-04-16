@@ -40,6 +40,15 @@ $(function(){
 
         template: _.template($('#item-template').html()),
 
+        events: {
+
+            'click a.destroy' : 'clear',
+        },
+
+        initialize: function(){
+            this.listenTo(this.model, 'destroy', this.remove);
+        },
+
         render: function(){
 
             this.$el.html(this.template(this.model.toJSON()));
@@ -47,6 +56,10 @@ $(function(){
             return this;
 
         },
+
+        clear: function(){
+            this.model.destroy();
+        }
 
     })
 
@@ -62,9 +75,9 @@ $(function(){
 
         initialize: function(){
 
-            this.$input = $('#new-todo');
-            this.$main = $('#main');
-            this.$footer = $('footer');
+            this.$input = this.$('#new-todo');
+            this.$main = this.$('#main');
+            this.$footer = this.$('footer');
 
             //监听集合的add事件，并调用addOne回调进行视图重绘
             this.listenTo(todoList, 'add', this.addOne);
