@@ -58,6 +58,11 @@ ul,li {
 	margin: 0 auto;
 }
 
+.todo-list li.done label{
+	color: #777;
+	text-decoration: line-through;
+}
+
 .todo-item {
 	border-bottom: 1px solid #ccc;
 	padding: 5px 0;

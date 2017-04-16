@@ -9,6 +9,10 @@ $(function(){
                 order: 0,
                 done: false,
             }
+        },
+
+        toggle: function(){
+            this.save({done: !this.get('done')});
         }
     });
 
@@ -42,19 +46,26 @@ $(function(){
 
         events: {
 
+            'click .toggle'   : 'toggleDone',
             'click a.destroy' : 'clear',
         },
 
         initialize: function(){
+            this.listenTo(this.model, 'change', this.render);
             this.listenTo(this.model, 'destroy', this.remove);
         },
 
         render: function(){
 
             this.$el.html(this.template(this.model.toJSON()));
+            this.$el.toggleClass('done', this.model.get('done'))
 
             return this;
 
+        },
+
+        toggleDone: function(){
+            this.model.toggle();
         },
 
         clear: function(){
@@ -71,6 +82,7 @@ $(function(){
 
         events: {
             'keypress #new-todo': 'createOnEnter',
+            'click #clear-completed': 'clearCompleted',
         },
 
         initialize: function(){
@@ -97,6 +109,10 @@ $(function(){
             todoList.create({title: this.$input.val()});
 
             this.$input.val('');
+
+        },
+
+        clearCompleted: function(){
 
         },
 
