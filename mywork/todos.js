@@ -29,10 +29,15 @@ $(function(){
 
         template: _.template($('#item-template').html()),
 
+        initialize: function(){
+
+            this.listenTo(this.model, 'change', this.render);
+        },
+
         render: function(){
 
             this.$el.html(this.template(this.model.toJSON()));
-
+            this.$el.toggleClass('done', this.model.get('done'));
             return this;
 
         },
@@ -51,6 +56,7 @@ $(function(){
         initialize: function(){
 
             this.$newTodo = this.$('#new-todo');
+            this.allCheckbox = this.$('#toggle-all')[0];
 
             this.listenTo(todos, 'add', this.addOne);
         },
@@ -77,7 +83,14 @@ $(function(){
 
         },
 
-        toggleAllCompleted: function(){},
+        toggleAllCompleted: function(){
+
+            var done = this.allCheckbox.checked;
+
+            todos.each(function(todo){
+                todo.save({'done': done});
+            })
+        },
 
     });
 
