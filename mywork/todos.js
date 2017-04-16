@@ -21,6 +21,19 @@ $(function(){
 
         localStorage: new Backbone.LocalStorage('todoMVC'),
 
+        done: function(){
+
+            return this.filter(function(todo){
+                return todo.get('done');
+            });
+
+        },
+
+        remaining: function(){
+
+            return this.without.apply(this, this.done());
+        },
+
     });
 
     var todos = new Todos;
@@ -74,12 +87,17 @@ $(function(){
             'click #toggle-all'     : 'toggleAllCompleted',
         },
 
+        statsTemplate: _.template($('#stats-template').html()),
+
         initialize: function(){
 
             this.$newTodo = this.$('#new-todo');
             this.allCheckbox = this.$('#toggle-all')[0];
+            this.$main = this.$('#main');
+            this.$footer = this.$('footer');
 
             this.listenTo(todos, 'add', this.addOne);
+            this.listenTo(todos, 'all', this.render);
         },
 
         createOnEnter: function(e){
@@ -111,6 +129,27 @@ $(function(){
             todos.each(function(todo){
                 todo.save({'done': done});
             })
+        },
+
+        render: function(){
+
+            var done = todos.done().length,
+                remaining = todos.remaining().length;
+
+            if(!todos.length) {
+
+                this.$main.hide();
+                this.$footer.hide();
+            }else {
+                this.$main.show();
+                this.$footer.show();
+                this.$footer.html(this.statsTemplate({
+                    done: done,
+                    remaining: remaining,
+                }));
+            }
+            this.allCheckbox.checked = !remaining;
+
         },
 
     });
