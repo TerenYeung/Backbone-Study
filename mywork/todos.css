@@ -63,6 +63,14 @@ ul,li {
 	text-decoration: line-through;
 }
 
+.todo-list li.editing .view {
+	display: none;
+}
+
+.todo-list li.editing .edit {
+	display: block;
+}
+
 .todo-item {
 	border-bottom: 1px solid #ccc;
 	padding: 5px 0;
