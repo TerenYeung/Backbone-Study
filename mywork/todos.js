@@ -2,36 +2,24 @@ $(function(){
 
     var Todo = Backbone.Model.extend({
 
-        defaults : function(){
+        defaults: function(){
 
             return {
-                title: 'Hello World',
-                order: 0,
+                title: 'todo',
                 done: false,
+                order: 0,
             }
         },
 
-        toggle: function(){
-            this.save({done: !this.get('done')});
-        }
     });
 
     var TodoList = Backbone.Collection.extend({
 
+        // url: '/',
+
         model: Todo,
 
-        done: function(){
-
-            return this.filter(function(todo){
-                return todo.get('done');
-            });
-        },
-
-        remaining: function(){
-            return this.without.apply(this, this.done());
-        },
-
-
+        localStorage: new Backbone.LocalStorage('todos-backbone'),
     });
 
     var todoList = new TodoList;
@@ -44,56 +32,40 @@ $(function(){
 
         template: _.template($('#item-template').html()),
 
-        events: {
-
-            'click .toggle'   : 'toggleDone',
-            'click a.destroy' : 'clear',
-        },
-
         initialize: function(){
-            this.listenTo(this.model, 'change', this.render);
-            this.listenTo(this.model, 'destroy', this.remove);
+
+            this.listenTo(this.model, 'change', this.render)
         },
 
         render: function(){
 
             this.$el.html(this.template(this.model.toJSON()));
-            this.$el.toggleClass('done', this.model.get('done'))
+            this.$el.toggleClass('done',this.model.get('done'));
 
             return this;
 
         },
 
-        toggleDone: function(){
-            this.model.toggle();
-        },
-
-        clear: function(){
-            this.model.destroy();
-        }
-
     })
 
     var AppView = Backbone.View.extend({
 
-        el: $('#todo-app'),
+        //AppView视图类的挂载节点
+        el: $('#app'),
 
-        statsTemplate: _.template($('#stats-template').html()),
-
+        //定义AppView视图类的各种事件及其回调函数
         events: {
-            'keypress #new-todo': 'createOnEnter',
-            'click #clear-completed': 'clearCompleted',
+            'keypress #new-todo'        : 'createOnEnter',
+            'click #toggle-all'      : 'toggleAllComplete',
+            'click #clear-completed' : 'clearCompleted',
         },
 
         initialize: function(){
+            // console.log(this.$)
+            this.$newTodo = this.$('#new-todo');
+            this.allCheckbox = this.$('#toggle-all')[0];
 
-            this.$input = this.$('#new-todo');
-            this.$main = this.$('#main');
-            this.$footer = this.$('footer');
-
-            //监听集合的add事件，并调用addOne回调进行视图重绘
             this.listenTo(todoList, 'add', this.addOne);
-            this.listenTo(todoList, 'all', this.render);
 
 
         },
@@ -102,46 +74,34 @@ $(function(){
 
             if(e.keyCode != 13) return;
 
-            if(!this.$input.val()) return;
+            if(!this.$newTodo.val()) return;
 
-            //使用集合的create方法可以直接创建一个model实例，
-            //并会立即出发add事件
-            todoList.create({title: this.$input.val()});
+            var title = this.$newTodo.val();
 
-            this.$input.val('');
+            todoList.create({title: title});
+
+            this.$newTodo.val('');
+        },
+
+        toggleAllComplete: function(){
+
+            var done = this.allCheckbox.checked;
+            todoList.each(function(todo){
+                todo.save({'done': done});
+            });
 
         },
 
-        clearCompleted: function(){
-
-        },
+        clearCompleted: function(){},
 
         addOne: function(todo){
             var todoView = new TodoView({model: todo});
             this.$('#todo-list').append(todoView.render().el);
-
         },
 
-        render: function(){
-           var done = todoList.done().length;
-           var remaining = todoList.remaining().length;
+    });
 
-           if(todoList.length) {
-               this.$main.show();
-               this.$footer.show();
-               this.$footer.html(this.statsTemplate(
-                    {
-                        done: done,remaining: remaining
-                    }
-               ));
-           }else {
-               this.$main.hide();
-               this.$footer.hide();
-           }
-
-        }
-
-    })
-
+    // 启动应用
     var App = new AppView;
+
 })
