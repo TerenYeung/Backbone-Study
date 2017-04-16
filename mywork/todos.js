@@ -50,6 +50,9 @@ $(function(){
 
             'click .toggle'     : 'toggleDone',
             'click a.destroy'   : 'clear',
+            'dblclick .view'    : 'edit',
+            'keypress .edit'    : 'updateOnEnter',
+            'blur .edit'        : 'close',
         },
 
         initialize: function(){
@@ -76,6 +79,25 @@ $(function(){
             this.model.destroy();
         },
 
+        edit: function(){
+          this.$el.addClass('editing');
+          this.$('.edit').focus();
+        },
+
+        updateOnEnter: function(e){
+            if(e.keyCode == 13) this.close();
+        },
+
+        close: function(){
+            var title = this.$('.edit').val();
+            if(!title){
+                this.clear();
+            }else {
+                this.model.save({title: title});
+                this.$el.removeClass('editing');
+            }
+        },
+
     })
 
     var AppView = Backbone.View.extend({
@@ -85,6 +107,7 @@ $(function(){
         events: {
             'keypress #new-todo'    : 'createOnEnter',
             'click #toggle-all'     : 'toggleAllCompleted',
+            'click #clear-completed': 'clearCompleted',
         },
 
         statsTemplate: _.template($('#stats-template').html()),
@@ -98,6 +121,9 @@ $(function(){
 
             this.listenTo(todos, 'add', this.addOne);
             this.listenTo(todos, 'all', this.render);
+            this.listenTo(todos, 'reset', this.addAll);
+
+            todos.fetch();
         },
 
         createOnEnter: function(e){
@@ -131,6 +157,11 @@ $(function(){
             })
         },
 
+        clearCompleted: function(){
+
+            _.invoke(todos.done(), 'destroy');
+        },
+
         render: function(){
 
             var done = todos.done().length,
@@ -151,6 +182,14 @@ $(function(){
             this.allCheckbox.checked = !remaining;
 
         },
+
+        addAll: function(){
+
+            var _this = this
+            todos.each(function(todo){
+                _this.addOne(todo);
+            })
+        }
 
     });
 
