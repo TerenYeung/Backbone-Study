@@ -1,105 +1,118 @@
 $(function(){
 
-    let Todo = Backbone.Model.extend({
+    var Todo = Backbone.Model.extend({
 
-        defaults: {
-            title: 'Hello World',
-            done: false,
-            order: 0,
-        },
+        defaults : function(){
 
-        initialize: function(){
-
-            // this.
+            return {
+                title: 'Hello World',
+                order: 0,
+                done: false,
+            }
         }
+    });
 
-    })
-
-    let Todos = Backbone.Collection.extend({
+    var TodoList = Backbone.Collection.extend({
 
         model: Todo,
 
+        done: function(){
+
+            return this.filter(function(todo){
+                return todo.get('done');
+            });
+        },
+
+        remaining: function(){
+            return this.without.apply(this, this.done());
+        },
+
+
     });
 
-    let TodoView = Backbone.View.extend({
+    var todoList = new TodoList;
+
+    var TodoView = Backbone.View.extend({
 
         tagName: 'li',
 
         className: 'todo-item',
 
-        initialize: function(){
-
-        },
-
-        events: {
-            'click .destroy': 'deleteTodo'
-        },
-
-
         template: _.template($('#item-template').html()),
 
-        render: function(data){
+        render: function(){
 
-            return this.$el.append(this.template(data))
+            this.$el.html(this.template(this.model.toJSON()));
+
+            return this;
+
         },
 
-        deleteTodo: function(){
-             this.model.destroy();
-             this.$el.html('')
-        }
+    })
 
+    var AppView = Backbone.View.extend({
 
+        el: $('#todo-app'),
 
+        statsTemplate: _.template($('#stats-template').html()),
 
-
-    });
-
-    let AppView = Backbone.View.extend({
-
-        //指定AppView类挂载的DOM节点
-        el: '#todo-app',
+        events: {
+            'keypress #new-todo': 'createOnEnter',
+        },
 
         initialize: function(){
 
-            this.todos = new Todos;
-            this.$input = this.$el.find('#new-todo');
-            this.$todoList = this.$el.find('#todo-list');
+            this.$input = $('#new-todo');
+            this.$main = $('#main');
+            this.$footer = $('footer');
 
-            this.listenTo(this.todos,'addTodo',this.render);
+            //监听集合的add事件，并调用addOne回调进行视图重绘
+            this.listenTo(todoList, 'add', this.addOne);
+            this.listenTo(todoList, 'all', this.render);
+
 
         },
 
-        events: {
-            'keypress #new-todo' : 'addItem'
-        },
-
-        addItem: function(e){
+        createOnEnter: function(e){
 
             if(e.keyCode != 13) return;
 
-            let title = this.$input.val();
-            if(!title) return;
+            if(!this.$input.val()) return;
 
-            let todo = new Todo({title: title});
+            //使用集合的create方法可以直接创建一个model实例，
+            //并会立即出发add事件
+            todoList.create({title: this.$input.val()});
 
-            //由todos集合出发addTodo事件
-            //然后由整个appView进行捕获
-            this.todos.add(todo)
-                      .trigger('addTodo',todo)
             this.$input.val('');
+
         },
 
+        addOne: function(todo){
+            var todoView = new TodoView({model: todo});
+            this.$('#todo-list').append(todoView.render().el);
 
-        render: function(todo){
-            let todoView = new TodoView({model: todo});
-            let $todoHTML = todoView.render(todo.attributes)
-            this.$todoList.append($todoHTML);
         },
 
-    });
+        render: function(){
+           var done = todoList.done().length;
+           var remaining = todoList.remaining().length;
 
+           if(todoList.length) {
+               this.$main.show();
+               this.$footer.show();
+               this.$footer.html(this.statsTemplate(
+                    {
+                        done: done,remaining: remaining
+                    }
+               ));
+           }else {
+               this.$main.hide();
+               this.$footer.hide();
+           }
 
-    let app = new AppView;
+        }
 
+    })
 
+    var App = new AppView;
 })
